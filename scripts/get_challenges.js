@@ -3,7 +3,7 @@ import path from 'path'
 
 import { get_local_json, set_local_json } from './utils.js'
 
-const json_dir = path.resolve('public/challenges.json')
+const json_dir = path.resolve('src/challenges.json')
 const root_url = 'https://www.vimgolf.com'
 
 const parser = new DOMParser()
