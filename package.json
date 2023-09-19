@@ -7,7 +7,8 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
-        "check": "svelte-check --tsconfig ./tsconfig.json"
+        "check": "svelte-check --tsconfig ./tsconfig.json",
+        "get_challenges": "node ./scripts/get_challenges.js"
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^2.4.2",
@@ -23,6 +24,7 @@
         "eslint-plugin-import": "^2.28.1",
         "eslint-plugin-prettier": "^5.0.0",
         "eslint-plugin-svelte": "^2.33.2",
+        "linkedom": "^0.15.3",
         "postcss": "^8.4.30",
         "prettier": "^3.0.3",
         "prettier-plugin-svelte": "^3.0.3",
