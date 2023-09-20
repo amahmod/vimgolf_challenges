@@ -1,13 +1,24 @@
 <script lang="ts">
-    import challenges from './challenges.json'
-    import { debounce } from './lib/util'
+    import { onMount } from 'svelte'
 
-    const completed_challenge_count = 0
+    import challenges from './challenges.json'
+    import { debounce, get_local_data, set_local_data } from './lib/util'
+
+    type CompletedChallengeItem = {
+        id: string
+        completed_at?: number
+    }
+
+    type Challenge = (typeof challenges)[number] & CompletedChallengeItem
+
+    let completed_challenge_count = 0
     let search_term = ''
     let sort_direction = 'asc' // asc, desc
     let sorted_column = ''
 
-    let filtered_challenges = challenges
+    let filtered_challenges = challenges as Challenge[]
+
+    let completed_challenge_items: CompletedChallengeItem[] = []
 
     function filter_challenges() {
         let temp = challenges
@@ -47,6 +58,62 @@
     }
 
     const search_challenges = debounce(filter_challenges, 500)
+
+    async function toggle_complete_status(
+        challenge_id: string,
+        is_completed: boolean
+    ) {
+        const index = completed_challenge_items.findIndex(
+            item => item.id === challenge_id
+        )
+
+        // update completed list
+        if (!is_completed) {
+            completed_challenge_items.splice(index, 1)
+            completed_challenge_count -= 1
+        } else {
+            completed_challenge_items = [
+                ...completed_challenge_items,
+                {
+                    id: challenge_id,
+                    completed_at: Date.now()
+                }
+            ]
+            completed_challenge_count += 1
+        }
+
+        // update filtered list
+        filtered_challenges = filtered_challenges.map(challenge => {
+            const item = challenge
+
+            if (item.id === challenge_id) {
+                item.completed_at = is_completed ? Date.now() : undefined
+            }
+
+            return item
+        })
+
+        await set_local_data('completed_challenges', completed_challenge_items)
+    }
+
+    onMount(async () => {
+        try {
+            completed_challenge_items = JSON.parse(
+                await get_local_data('completed_challenges')
+            ) as CompletedChallengeItem[]
+        } catch (e) {
+            completed_challenge_items = []
+        }
+
+        completed_challenge_count = completed_challenge_items.length
+
+        filtered_challenges = filtered_challenges.map(challenge => {
+            const completed_at = completed_challenge_items.find(
+                item => item.id === challenge.id
+            )?.completed_at
+            return completed_at ? { ...challenge, completed_at } : challenge
+        })
+    })
 </script>
 
 <div
@@ -55,11 +122,11 @@
         <div>
             <p>
                 Total Challenges :
-                <span class="font-bold">
+                <span class="font-bold text-green-500">
                     {completed_challenge_count}
                 </span>
                 /
-                <span class="font-bold">
+                <span class="font-bold text-gray-600">
                     {challenges.length}
                 </span>
             </p>
@@ -74,7 +141,7 @@
         </div>
     </div>
     <table class="w-full text-sm etxt-left text-gray-500 mt-4">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b-2">
             <tr class="text-left">
                 <th class="px-6 py-2">Title</th>
                 <th class="px-6 py-2">
@@ -140,7 +207,9 @@
         </thead>
         <tbody>
             {#each filtered_challenges as item}
-                <tr class="bg-white border-b">
+                <tr
+                    class="bg-white border-b"
+                    class:completed={item.completed_at}>
                     <td class="px-6 py-4 font-bold">
                         <a
                             class="hover:underline hover:underline-offset-2 decoration-wavy decoration-blue-400"
@@ -154,8 +223,15 @@
                     <td class="px-6 py4">{item.lowest_score}</td>
                     <td class="px-6 py4">
                         <div class="flex gap-2">
-                            <button title="Mark as completed">
+                            <button
+                                title="Toggle complete status"
+                                on:click={() =>
+                                    toggle_complete_status(
+                                        item.id,
+                                        !item.completed_at
+                                    )}>
                                 <svg
+                                    class:completed={item?.completed_at}
                                     class="w-5 h-5"
                                     fill="currentColor"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -210,3 +286,12 @@
         </tbody>
     </table>
 </div>
+
+<style lang="postcss">
+    button .completed {
+        @apply text-green-900;
+    }
+    tr.completed {
+        @apply bg-green-50;
+    }
+</style>

@@ -15,3 +15,11 @@ export function debounce<T extends (...args: unknown[]) => void>(
         }, delay)
     }
 }
+
+export async function get_local_data<T>(key: string) {
+    return localStorage.getItem(key) as unknown as T
+}
+
+export async function set_local_data(key: string, value: unknown) {
+    return localStorage.setItem(key, JSON.stringify(value))
+}
