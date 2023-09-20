@@ -1,7 +1,52 @@
 <script lang="ts">
     import challenges from './challenges.json'
+    import { debounce } from './lib/util'
 
     const completed_challenge_count = 0
+    let search_term = ''
+    let sort_direction = 'asc' // asc, desc
+    let sorted_column = ''
+
+    let filtered_challenges = challenges
+
+    function filter_challenges() {
+        let temp = challenges
+
+        if (search_term?.trim()?.length) {
+            temp = temp.filter(challenge =>
+                challenge.title
+                    .toLowerCase()
+                    .includes(search_term.toLowerCase())
+            )
+        }
+
+        if (sorted_column) {
+            temp.sort((a, b) => {
+                const val_a = a[sorted_column as keyof typeof a] as number
+                const val_b = b[sorted_column as keyof typeof b] as number
+
+                if (val_a < val_b) return sort_direction === 'asc' ? -1 : 1
+                if (val_a > val_b) return sort_direction === 'asc' ? 1 : -1
+
+                return 0
+            })
+        }
+
+        filtered_challenges = temp
+    }
+
+    function sort_challenges(column: string) {
+        if (sorted_column === column) {
+            sort_direction = sort_direction === 'asc' ? 'desc' : 'asc'
+        } else {
+            sorted_column = column
+            sort_direction = 'asc'
+        }
+
+        filter_challenges()
+    }
+
+    const search_challenges = debounce(filter_challenges, 500)
 </script>
 
 <div
@@ -21,6 +66,8 @@
         </div>
         <div>
             <input
+                bind:value={search_term}
+                on:input={search_challenges}
                 type="text"
                 placeholder="Search..."
                 class="px-2 py-0.5 rounded border outline-none hover:border-gray-400 transition duration-200" />
@@ -30,14 +77,66 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
             <tr class="text-left">
                 <th class="px-6 py-2">Title</th>
-                <th class="px-6 py-2">Active Golfers</th>
-                <th class="px-6 py-2">Total Entries</th>
-                <th class="px-6 py-2">Best Score</th>
+                <th
+                    class="px-6 py-2"
+                    on:click={() => sort_challenges('active_golfers')}>
+                    <div class="flex items-center">
+                        Active Golfers
+                        <a href="#/">
+                            <svg
+                                class="w-3 h-3 ml-1.5"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
+                            </svg>
+                        </a>
+                    </div>
+                </th>
+                <th
+                    class="px-6 py-2"
+                    on:click={() => sort_challenges('total_entries')}>
+                    <div class="flex items-center">
+                        Total Entries
+                        <a href="#/">
+                            <svg
+                                class="w-3 h-3 ml-1.5"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
+                            </svg>
+                        </a>
+                    </div>
+                </th>
+                <th
+                    class="px-6 py-2"
+                    on:click={() => sort_challenges('lowest_score')}>
+                    <div class="flex items-center">
+                        Best Score
+
+                        <a href="#/">
+                            <svg
+                                class="w-3 h-3 ml-1.5"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z" />
+                            </svg>
+                        </a>
+                    </div>
+                </th>
                 <th class="px-6 py-2">Actions</th>
             </tr>
         </thead>
         <tbody>
-            {#each challenges as item}
+            {#each filtered_challenges as item}
                 <tr class="bg-white border-b">
                     <td class="px-6 py-4 font-bold">{item.title}</td>
                     <td class="px-6 py4">{item.active_golfers}</td>
