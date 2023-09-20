@@ -116,7 +116,7 @@ async function recursive_get_challenges(page_number = 1) {
 
     const new_challenges = await get_challenges(filtered_challenge_ids)
     new_challenges_count += new_challenges.length
-    all_challenges = [...new_challenges, ...all_challenges]
+    all_challenges = [...all_challenges, ...new_challenges]
     await set_local_json(json_dir, all_challenges)
 
     if (challenge_ids?.length !== filtered_challenge_ids?.length) {
