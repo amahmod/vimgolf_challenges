@@ -100,11 +100,12 @@
 
     onMount(async () => {
         try {
-            completed_challenge_items = JSON.parse(
-                await get_local_data('completed_challenges')
-            ) as CompletedChallengeItem[]
+            completed_challenge_items =
+                (JSON.parse(
+                    await get_local_data('completed_challenges')
+                ) as CompletedChallengeItem[]) || []
         } catch (e) {
-            completed_challenge_items = []
+            console.log(e)
         }
 
         completed_challenge_count = completed_challenge_items.length
