@@ -77,12 +77,13 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
             <tr class="text-left">
                 <th class="px-6 py-2">Title</th>
-                <th
-                    class="px-6 py-2"
-                    on:click={() => sort_challenges('active_golfers')}>
+                <th class="px-6 py-2">
                     <div class="flex items-center">
                         Active Golfers
-                        <a href="#/">
+                        <a
+                            href="#/"
+                            on:click|preventDefault={() =>
+                                sort_challenges('active_golfers')}>
                             <svg
                                 class="w-3 h-3 ml-1.5"
                                 aria-hidden="true"
@@ -95,12 +96,13 @@
                         </a>
                     </div>
                 </th>
-                <th
-                    class="px-6 py-2"
-                    on:click={() => sort_challenges('total_entries')}>
+                <th class="px-6 py-2">
                     <div class="flex items-center">
                         Total Entries
-                        <a href="#/">
+                        <a
+                            href="#/"
+                            on:click|preventDefault={() =>
+                                sort_challenges('total_entries')}>
                             <svg
                                 class="w-3 h-3 ml-1.5"
                                 aria-hidden="true"
@@ -113,13 +115,14 @@
                         </a>
                     </div>
                 </th>
-                <th
-                    class="px-6 py-2"
-                    on:click={() => sort_challenges('lowest_score')}>
+                <th class="px-6 py-2">
                     <div class="flex items-center">
                         Best Score
 
-                        <a href="#/">
+                        <a
+                            href="#/"
+                            on:click|preventDefault={() =>
+                                sort_challenges('lowest_score')}>
                             <svg
                                 class="w-3 h-3 ml-1.5"
                                 aria-hidden="true"
@@ -138,7 +141,14 @@
         <tbody>
             {#each filtered_challenges as item}
                 <tr class="bg-white border-b">
-                    <td class="px-6 py-4 font-bold">{item.title}</td>
+                    <td class="px-6 py-4 font-bold">
+                        <a
+                            class="hover:underline hover:underline-offset-2 decoration-wavy decoration-blue-400"
+                            href="https://www.vimgolf.com/challenges/{item.id}"
+                            target="_blank">
+                            {item.title}
+                        </a>
+                    </td>
                     <td class="px-6 py4">{item.active_golfers}</td>
                     <td class="px-6 py4">{item.total_entries}</td>
                     <td class="px-6 py4">{item.lowest_score}</td>
@@ -193,33 +203,6 @@
                                         stroke-linejoin="round"
                                         stroke-width="16" /></svg>
                             </button>
-                            <a
-                                href="https://www.vimgolf.com/challenges/{item.id}"
-                                target="_blank"
-                                class="inline-block">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 256 256"
-                                    fill="currentColor"
-                                    class="w-5 h-5 text-blue-500">
-                                    <rect
-                                        width="256"
-                                        height="256"
-                                        fill="none" /><path
-                                        d="M131.88,192l-9.94,9.94a48,48,0,0,1-67.88-67.88L78.17,110A48,48,0,0,1,144,108"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="16" /><path
-                                        d="M124.12,64l9.94-9.94a48,48,0,0,1,67.88,67.88l-24.11,24.11A48,48,0,0,1,112,148"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="16" />
-                                </svg>
-                            </a>
                         </div>
                     </td>
                 </tr>
